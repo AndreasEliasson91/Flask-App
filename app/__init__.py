@@ -3,19 +3,17 @@ from flask import Flask
 
 
 def create_app():
-    app = Flask(__name__)
-    app.config.from_pyfile('settings.py')
-    init_db(app)
+    _app = Flask(__name__)
+    _app.config.from_pyfile('settings.py')
+    init_db(_app)
 
-    @app.get('/')
-    def index():
-        from app.persistance.models import User
-        user = User({'username': 'test_user', 'password': 'testing123', 'email': 'test@testmail.com'})
-        user.save()
+    from app.blueprints.open import bp_open
+    _app.register_blueprint(bp_open)
 
-    return app
+    from app.blueprints.user import bp_user
+    _app.register_blueprint(bp_user, url_prefix='/user')
 
+    from app.blueprints.admin import bp_admin
+    _app.register_blueprint(bp_admin, url_prefix='/admin')
 
-if __name__ == '__main__':
-    app = create_app()
-    app.run()
+    return _app
